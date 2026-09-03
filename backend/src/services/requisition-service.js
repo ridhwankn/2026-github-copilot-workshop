@@ -98,6 +98,46 @@ export async function getRequisitionOpenLines(db, id) {
   };
 }
 
+export async function getAvailablePrLinesForAllocation(db) {
+  // Get all PR lines from APPROVED requisitions that have remaining qty to allocate
+  const { rows } = await db.query(
+    `SELECT 
+       pl.id,
+       pl.line_no,
+       pl.item_code,
+       pl.item_name,
+       pl.qty_requested,
+       pl.qty_allocated,
+       pl.qty_received,
+       pl.uom,
+       pl.est_unit_price,
+       pl.site_code,
+       pl.required_date,
+       pr.id as pr_id,
+       pr.pr_number
+     FROM pr_lines pl
+     JOIN purchase_requisitions pr ON pr.id = pl.pr_id
+     WHERE pr.status = 'APPROVED'
+       AND (pl.qty_requested - pl.qty_allocated) > 0
+     ORDER BY pr.created_at DESC, pl.line_no ASC`
+  );
+
+  return rows.map((row) => ({
+    id: row.id,
+    prNumber: row.pr_number,
+    prId: row.pr_id,
+    itemCode: row.item_code,
+    itemName: row.item_name,
+    qtyRequested: Number(row.qty_requested),
+    qtyAllocated: Number(row.qty_allocated),
+    qtyRemaining: Number(row.qty_requested) - Number(row.qty_allocated),
+    uom: row.uom,
+    estUnitPrice: Number(row.est_unit_price),
+    siteCode: row.site_code,
+    requiredDate: row.required_date,
+  }));
+}
+
 function validateCreatePayload(payload) {
   if (!payload || typeof payload !== 'object') {
     return 'Body is required';

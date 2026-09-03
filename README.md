@@ -23,6 +23,14 @@ Canonical workshop document: [docs/plan.md](docs/plan.md)
 
 ## Quick Start
 
+### Install the pre-push test hook
+```bash
+npm run setup:hooks
+```
+
+After setup, every `git push` runs `npm test`. A failed test returns a non-zero
+exit code and blocks the push.
+
 ### 1) Start PostgreSQL
 ```bash
 docker compose up -d db

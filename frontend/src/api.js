@@ -16,7 +16,10 @@ async function apiFetch(path, options = {}) {
 
   if (!response.ok) {
     const message = data?.message || `Request failed: ${response.status}`;
-    throw new Error(message);
+    const error = new Error(message);
+    error.statusCode = response.status;
+    error.data = data;
+    throw error;
   }
 
   return data;
@@ -51,4 +54,19 @@ export const api = {
       method: 'POST',
     }),
   getRequisitionOpenLines: (id) => apiFetch(`/api/requisitions/${id}/open-lines`),
+  getAvailablePrLinesForAllocation: () => apiFetch('/api/requisitions/available/for-allocation'),
+
+  // Purchase Order API methods
+  listPurchaseOrders: () => apiFetch('/api/purchase-orders'),
+  createPurchaseOrder: (payload) =>
+    apiFetch('/api/purchase-orders', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  getPurchaseOrder: (id) => apiFetch(`/api/purchase-orders/${id}`),
+  submitPurchaseOrder: (id) =>
+    apiFetch(`/api/purchase-orders/${id}/submit`, {
+      method: 'POST',
+    }),
+  getOpenPurchaseOrderLines: (id) => apiFetch(`/api/purchase-orders/${id}/open-lines`),
 };

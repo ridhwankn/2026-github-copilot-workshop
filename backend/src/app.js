@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import dbPlugin from './plugins/db.js';
+import swaggerPlugin from './plugins/swagger.js';
 import requisitionRoutes from './routes/requisition-routes.js';
 import purchaseOrderRoutes from './routes/purchase-order-routes.js';
 
@@ -11,11 +12,20 @@ export function buildApp() {
     origin: true,
   });
 
+  app.register(swaggerPlugin);
   app.register(dbPlugin);
   app.register(requisitionRoutes);
   app.register(purchaseOrderRoutes);
 
-  app.get('/health', async () => ({ status: 'ok' }));
+  app.get('/health', 
+    {
+      schema: {
+        description: 'Health check endpoint',
+        tags: ['Health'],
+      },
+    },
+    async () => ({ status: 'ok' })
+  );
 
   app.setErrorHandler((error, request, reply) => {
     request.log.error(error);
