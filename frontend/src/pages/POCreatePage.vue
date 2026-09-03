@@ -155,11 +155,11 @@ async function handleSubmit() {
   width: 32px;
   height: 32px;
   border-radius: 4px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-color);
+  border: 1px solid var(--border);
+  background: var(--bg);
   cursor: pointer;
   font-size: 18px;
-  color: var(--text-color);
+  color: var(--text);
   text-decoration: none;
 }
 
