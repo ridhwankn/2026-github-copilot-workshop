@@ -15,7 +15,7 @@
       <!-- Available PR Lines Table -->
       <div class="section">
         <p class="section-title">Available Requisition Lines</p>
-        <table class="requisition-table">
+        <table class="requisition-table" data-testid="available-pr-lines">
           <thead>
             <tr>
               <th style="width: 40px"></th>
@@ -51,6 +51,7 @@
                 <button
                   type="button"
                   class="btn-action"
+                  :data-testid="`add-pr-line-${line.id}`"
                   @click="toggleLineSelection(line)"
                   :title="isLineSelected(line.id) ? 'Remove' : 'Add'"
                 >
@@ -95,6 +96,7 @@
                   :max="line.qtyRemaining"
                   @change="validateAllocation(index)"
                   class="qty-input"
+                  :data-testid="`allocation-qty-${index}`"
                   required
                 />
               </td>

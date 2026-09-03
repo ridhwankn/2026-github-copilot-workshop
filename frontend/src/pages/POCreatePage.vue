@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+    <p v-if="errorMessage" class="error" data-testid="po-error">{{ errorMessage }}</p>
 
     <form @submit.prevent="handleSubmit">
       <!-- PO Header card -->
@@ -31,7 +31,7 @@
       <!-- Action buttons -->
       <div class="btn-group">
         <RouterLink to="/purchase-orders" class="btn btn-outline">Cancel</RouterLink>
-        <button class="btn btn-primary" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Creating...' : 'Save As Draft' }}</button>
+        <button class="btn btn-primary" type="submit" data-testid="save-po" :disabled="isSubmitting">{{ isSubmitting ? 'Creating...' : 'Save As Draft' }}</button>
       </div>
     </form>
   </section>

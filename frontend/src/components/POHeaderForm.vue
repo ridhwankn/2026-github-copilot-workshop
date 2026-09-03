@@ -8,6 +8,7 @@
           :value="vendorName"
           @input="$emit('update:vendorName', $event.target.value)"
           placeholder="Enter vendor name..."
+          data-testid="vendor-name"
           required
         />
       </div>
