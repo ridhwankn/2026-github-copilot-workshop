@@ -8,26 +8,27 @@
       </div>
       <div class="btn-group">
         <RouterLink to="/requisitions/new" class="btn btn-outline">+ New PR</RouterLink>
+        <RouterLink to="/purchase-orders/new" class="btn btn-outline">+ New PO</RouterLink>
       </div>
     </div>
 
     <!-- Stat cards -->
     <div class="stat-cards">
       <div class="stat-card">
-        <span class="stat-card-title">Open PR</span>
+        <span class="stat-card-title">Purchase Requisitions</span>
         <span class="stat-card-value">{{ stats.totalPr }}</span>
       </div>
       <div class="stat-card">
-        <span class="stat-card-title">Draft</span>
-        <span class="stat-card-value">{{ stats.draftPr }}</span>
+        <span class="stat-card-title">Purchase Orders</span>
+        <span class="stat-card-value">{{ stats.totalPo }}</span>
       </div>
       <div class="stat-card">
-        <span class="stat-card-title">Submitted</span>
-        <span class="stat-card-value">{{ stats.submittedPr }}</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-card-title">Approved</span>
+        <span class="stat-card-title">Approved PR</span>
         <span class="stat-card-value">{{ stats.approvedPr }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-title">Submitted PO</span>
+        <span class="stat-card-value">{{ stats.submittedPo }}</span>
       </div>
     </div>
 
@@ -58,6 +59,34 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Recent Purchase Orders -->
+    <div class="card-panel">
+      <div class="card-panel-header">
+        <h3>Recent Purchase Orders</h3>
+        <RouterLink to="/purchase-orders">View All</RouterLink>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>PO No</th>
+            <th>Vendor</th>
+            <th>Status</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in stats.recentPo" :key="item.id">
+            <td><RouterLink :to="`/purchase-orders/${item.id}`">{{ item.poNumber }}</RouterLink></td>
+            <td>{{ item.vendorName }}</td>
+            <td>
+              <span class="status-badge" :class="item.status.toLowerCase()">{{ item.status }}</span>
+            </td>
+            <td>{{ item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 </template>
 
@@ -72,10 +101,24 @@ const stats = reactive({
   submittedPr: 0,
   approvedPr: 0,
   recentPr: [],
+  totalPo: 0,
+  submittedPo: 0,
+  recentPo: [],
 });
 
 onMounted(async () => {
-  const payload = await api.getDashboard();
-  Object.assign(stats, payload);
+  const prPayload = await api.getDashboard();
+  Object.assign(stats, prPayload);
+  
+  // Load PO data
+  try {
+    const poResponse = await api.listPurchaseOrders();
+    const pos = poResponse.items || [];
+    stats.totalPo = pos.length;
+    stats.submittedPo = pos.filter((po) => po.status === 'SUBMITTED').length;
+    stats.recentPo = pos.slice(0, 5);
+  } catch (error) {
+    console.error('Error loading PO data:', error);
+  }
 });
 </script>

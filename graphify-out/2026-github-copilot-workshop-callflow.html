@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026-github-copilot-workshop — Complete Call Flow &amp; Architecture Documentation</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --border: #334155;
+  --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+  --warn: #fbbf24; --err: #f87171; --ok: #34d399;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+.container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 2.4rem; margin-bottom: 8px; background: linear-gradient(135deg, var(--accent), #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h2 { font-size: 1.7rem; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+h3 { font-size: 1.25rem; margin: 32px 0 12px; color: var(--accent); }
+h4 { font-size: 1.05rem; margin: 20px 0 8px; color: var(--warn); }
+p { margin: 8px 0; color: var(--muted); }
+.subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 32px; }
+.mermaid { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin: 20px 0; overflow-x: auto; position: relative; }
+.mermaid.is-enhanced { padding: 0; overflow: hidden; min-height: 260px; }
+.mermaid-viewport { padding: 54px 24px 24px; overflow: hidden; cursor: grab; touch-action: none; min-height: 260px; }
+.mermaid-viewport.is-dragging { cursor: grabbing; }
+.mermaid-viewport svg { max-width: none !important; height: auto; transform-origin: 0 0; transition: transform 120ms ease; }
+.mermaid-toolbar { position: absolute; top: 10px; right: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; padding: 6px; background: rgba(15,23,42,0.92); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.28); }
+.mermaid-toolbar button, .mermaid-toolbar .zoom-level { height: 28px; min-width: 32px; border: 1px solid var(--border); border-radius: 6px; background: #1e293b; color: var(--text); font: 600 0.78rem system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; }
+.mermaid-toolbar button { cursor: pointer; }
+.mermaid-toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+.mermaid-toolbar .zoom-level { min-width: 52px; color: var(--muted); background: transparent; }
+.call-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+.call-table th { background: #1a2744; color: var(--accent); text-align: left; padding: 10px 14px; border: 1px solid var(--border); }
+.call-table td { padding: 8px 14px; border: 1px solid var(--border); vertical-align: top; }
+.call-table tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.tag-async { background: #7c3aed33; color: #a78bfa; }
+.tag-class { background: #05966933; color: var(--ok); }
+.tag-func { background: #2563eb33; color: var(--accent); }
+.tag-cmd { background: #d9770633; color: var(--warn); }
+.tag-endpoint { background: #dc262633; color: var(--err); }
+.tag-hook { background: #db277733; color: #f472b6; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin: 16px 0; }
+.arrow-chain { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent); padding: 10px; background: rgba(56,189,248,0.06); border-radius: 6px; }
+code { font-family: 'Fira Code', 'Cascadia Code', monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 3px; font-size: 0.88em; }
+ul, ol { margin: 8px 0 8px 24px; color: var(--muted); }
+li { margin: 4px 0; }
+a { color: var(--accent); }
+hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+.nav { position: sticky; top: 0; background: var(--bg); z-index: 10; padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.9rem; }
+.nav a { text-decoration: none; }
+.nav a:hover { text-decoration: underline; }
+@media (max-width: 768px) { .container { padding: 16px; } h1 { font-size: 1.8rem; } }
+
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>2026-github-copilot-workshop — Complete Call Flow &amp; Architecture Documentation</h1>
+<p class="subtitle">Generated from graphify knowledge graph: 162 nodes, 217 edges, 14 communities. Commit: 19a616f</p>
+
+<div class="nav">
+    <a href="#overview">Architecture Overview</a>
+    <a href="#build-graph">Graph Build</a>
+    <a href="#serve-api">Serving API</a>
+    <a href="#tests-fixtures">Tests &amp; Fixtures</a>
+    <a href="#backend-appjs-dbjs">Backend Appjs Dbjs</a>
+    <a href="#mvp-dbsh-docker">Mvp Dbsh Docker</a>
+    <a href="#playwrightconfigjs-defineconfig">Playwrightconfigjs Defineconfig</a>
+    <a href="#jestconfigjs-backend">Jestconfigjs Backend</a>
+    <a href="#viteconfigjs-frontend">Viteconfigjs Frontend</a>
+</div>
+
+<!-- ====== Architecture Overview ====== -->
+<h2 id="overview">1. Architecture Overview</h2>
+
+<div class="mermaid">
+
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    BUILD_GRAPH_321CBB04("Graph Build<br/><small>84 nodes</small>")
+    class BUILD_GRAPH_321CBB04 module;
+    SERVE_API_35EC8E86("Serving API<br/><small>31 nodes</small>")
+    class SERVE_API_35EC8E86 module;
+    TESTS_FIXTURES_B84B1DCC("Tests &amp; Fixtures<br/><small>33 nodes</small>")
+    class TESTS_FIXTURES_B84B1DCC module;
+    BACKEND_APPJS_DBJS_3262334C("Backend Appjs Dbjs<br/><small>8 nodes</small>")
+    class BACKEND_APPJS_DBJS_3262334C module;
+    MVP_DBSH_DOCKER_88673E7A("Mvp Dbsh Docker<br/><small>2 nodes</small>")
+    class MVP_DBSH_DOCKER_88673E7A module;
+    PLAYWRIGHTCONFIGJS_DEFINECONFIG_1916F426("Playwrightconfigjs Defineconfig<br/><small>2 nodes</small>")
+    class PLAYWRIGHTCONFIGJS_DEFINECONFIG_1916F426 module;
+    JESTCONFIGJS_BACKEND_1F3C1D9C("Jestconfigjs Backend<br/><small>1 nodes</small>")
+    class JESTCONFIGJS_BACKEND_1F3C1D9C module;
+    VITECONFIGJS_FRONTEND_7A3F3B55("Viteconfigjs Frontend<br/><small>1 nodes</small>")
+    class VITECONFIGJS_FRONTEND_7A3F3B55 module;
+    BACKEND_APPJS_DBJS_3262334C -->|indirect call x6| TESTS_FIXTURES_B84B1DCC
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h4>Architecture Layers</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>Layer</th><th>Nodes</th><th>Communities</th></tr>
+      <tr><td>Graph Build</td><td>84</td><td><code>2, 4, 5, 6, 7, 8</code></td></tr><tr><td>Serving API</td><td>31</td><td><code>0</code></td></tr><tr><td>Tests &amp; Fixtures</td><td>33</td><td><code>1, 3</code></td></tr><tr><td>Backend Appjs Dbjs</td><td>8</td><td><code>9</code></td></tr><tr><td>Mvp Dbsh Docker</td><td>2</td><td><code>10</code></td></tr><tr><td>Playwrightconfigjs Defineconfig</td><td>2</td><td><code>11</code></td></tr><tr><td>Jestconfigjs Backend</td><td>1</td><td><code>12</code></td></tr><tr><td>Viteconfigjs Frontend</td><td>1</td><td><code>13</code></td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Core Flow</h4>
+    <div class="arrow-chain">Graph Build -&gt; Serving API -&gt; Tests &amp; Fixtures -&gt; Backend Appjs Dbjs -&gt; Mvp Dbsh Docker -&gt; Playwrightconfigjs Defineconfig -&gt; Jestconfigjs Backend</div>
+  </div>
+</div>
+<hr>
+<!-- ====== 2. Graph Build ====== -->
+<h2 id="build-graph">2. Graph Build</h2>
+<p>Graph Build groups implementation around packagejson, frontend, backend, vue, mostly in frontend/package.json, package.json, backend/package.json. This section covers 84 nodes and 81 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Graph Build (84 nodes, 81 edges)
+    subgraph build_graph_backend_package_json_fef74fa2["backend/package.json"]
+        backend_package_dependencies_dotenv_8389886b("dotenv<br/><small>backend/package.json</small>")
+        backend_package_dependencies_fastify_d26c18cd("fastify<br/><small>backend/package.json</small>")
+        backend_package_dependencies_fastify_cors_76452db0("@fastify/cors<br/><small>backend/package.json</small>")
+        backend_package_dependencies_fastify_plugin_465072f7("fastify-plugin<br/><small>backend/package.json</small>")
+        backend_package_dependencies_pg_e8aa420e("pg<br/><small>backend/package.json</small>")
+        backend_package_dependencies_uuid_6ec95155("uuid<br/><small>backend/package.json</small>")
+        backend_package_devdependencies_jest_b3152be8("jest<br/><small>backend/package.json</small>")
+        jest_14fdeea7("jest<br/><small>backend/package.json</small>")
+        dotenv_4de95cba("dotenv<br/><small>backend/package.json</small>")
+        fastify_c1855c58("fastify<br/><small>backend/package.json</small>")
+    end
+    subgraph build_graph_frontend_package_json_640d842e["frontend/package.json"]
+        frontend_package_dependencies_vue_7e38f7d0("vue<br/><small>frontend/package.json</small>")
+        vue_735f20cd("vue<br/><small>frontend/package.json</small>")
+        frontend_package_dependencies_vue_router_8fb9b8a8("vue-router<br/><small>frontend/package.json</small>")
+        vue_router_f09a3e6b("vue-router<br/><small>frontend/package.json</small>")
+    end
+    subgraph build_graph_package_json_4e40bfbd["package.json"]
+        package_devdependencies_concurrently_964f256f("concurrently<br/><small>package.json</small>")
+        concurrently_ca0af8a7("concurrently<br/><small>package.json</small>")
+        package_devdependencies_playwright_test_e4a38424("@playwright/test<br/><small>package.json</small>")
+        playwright_test_3951f777("@playwright/test<br/><small>package.json</small>")
+    end
+    frontend_package_dependencies_vue_7e38f7d0 -->|imports| vue_735f20cd
+    frontend_package_dependencies_vue_router_8fb9b8a8 -->|imports| vue_router_f09a3e6b
+    package_devdependencies_concurrently_964f256f -->|imports| concurrently_ca0af8a7
+    package_devdependencies_playwright_test_e4a38424 -->|imports| playwright_test_3951f777
+    backend_package_devdependencies_jest_b3152be8 -->|imports| jest_14fdeea7
+    backend_package_dependencies_dotenv_8389886b -->|imports| dotenv_4de95cba
+    backend_package_dependencies_fastify_d26c18cd -->|imports| fastify_c1855c58
+    %% Omitted for readability: 66 nodes, 0 edges
+    class backend_package_dependencies_dotenv_8389886b function;
+    class backend_package_dependencies_fastify_d26c18cd function;
+    class backend_package_dependencies_fastify_cors_76452db0 function;
+    class backend_package_dependencies_fastify_plugin_465072f7 function;
+    class backend_package_dependencies_pg_e8aa420e function;
+    class backend_package_dependencies_uuid_6ec95155 function;
+    class backend_package_devdependencies_jest_b3152be8 function;
+    class jest_14fdeea7 function;
+    class dotenv_4de95cba function;
+    class fastify_c1855c58 function;
+    class frontend_package_dependencies_vue_7e38f7d0 function;
+    class vue_735f20cd function;
+    class frontend_package_dependencies_vue_router_8fb9b8a8 api;
+    class vue_router_f09a3e6b api;
+    class package_devdependencies_concurrently_964f256f function;
+    class concurrently_ca0af8a7 function;
+    class package_devdependencies_playwright_test_e4a38424 function;
+    class playwright_test_3951f777 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>frontend/package.json</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>frontend/package.json node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>dependencies</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>dependencies node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>vue</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>vue</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td>vue node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>vue-router</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>vue-router</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td>vue-router node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>name</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>name node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>private</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>private node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>scripts</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>scripts node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>build</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>dev</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>dev node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>preview</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>preview node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>test</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>test:coverage</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Supports retrieval-augmented Q&amp;A or streaming chat.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>test:watch</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>type</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>type node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>version</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>version node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>vue</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>vue</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>vue node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>vue-router</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td><code>vue-router</code><br><small style="color:var(--muted)">frontend/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>vue-router node in frontend/package.json.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>package.json</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>package.json node in package.json.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>author</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>author node in package.json.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>description</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>description node in package.json.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>devDependencies</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>devDependencies node in package.json.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>concurrently</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>concurrently</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td>concurrently node in package.json.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>@playwright/test</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>@playwright/test</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>directories</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>directories node in package.json.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>doc</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>doc node in package.json.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>license</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>license node in package.json.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>main</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>main node in package.json.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>name</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>name node in package.json.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>version</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>version node in package.json.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>concurrently</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>concurrently</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>concurrently node in package.json.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>frontend/package.json</code></td><td>30 nodes</td></tr>
+<tr><td><code>package.json</code></td><td>28 nodes</td></tr>
+<tr><td><code>backend/package.json</code></td><td>26 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x64, imports x17. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 3. Serving API ====== -->
+<h2 id="serve-api">3. Serving API</h2>
+<p>Serving API groups implementation around frontend, pages, requisitioncreatepagevue, requisitiondetailpagevue, mostly in src/pages/RequisitionCreatePage.vue, src/pages/RequisitionDetailPage.vue, frontend/src/App.vue. This section covers 31 nodes and 39 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Serving API (31 nodes, 39 edges)
+    subgraph serve_api_frontend_src_App_vue_4a01d3f2["frontend/src/App.vue"]
+        frontend_src_app_7da8908b("App.vue")
+        frontend_src_app_isdashboard_f319df13("isDashboard<br/><small>frontend/src/App.vue</small>")
+        frontend_src_app_isrequisitions_0ea7c265("isRequisitions<br/><small>frontend/src/App.vue</small>")
+        frontend_src_app_route_2a6709b5("route<br/><small>frontend/src/App.vue</small>")
+    end
+    subgraph serve_api_src_pages_RequisitionCreatePage_vue_157bcc36["src/pages/RequisitionCreatePage.vue"]
+        frontend_src_pages_requisitioncreatepage_9720cb43("RequisitionCreatePage.vue")
+        frontend_src_pages_requisitioncreatepage_addline_867f4c09("addLine()<br/><small>src/pages/RequisitionCreatePage.vue</small>")
+        frontend_src_pages_requisitioncreatepage_emptyli_6c661a49("emptyLine()<br/><small>src/pages/RequisitionCreatePage.vue</small>")
+        frontend_src_pages_requisitioncreatepage_errorme_f235a113("errorMessage<br/><small>src/pages/RequisitionCreatePage.vue</small>")
+    end
+    subgraph serve_api_frontend_src_api_js_14772c1b["frontend/src/api.js"]
+        frontend_src_api_api_ec67b69b("api<br/><small>frontend/src/api.js</small>")
+        frontend_src_api_c5c4f956("api.js")
+        frontend_src_api_apifetch_0cb412a6("apiFetch()<br/><small>frontend/src/api.js</small>")
+    end
+    subgraph serve_api_src_pages_DashboardPage_vue_082b3d24["src/pages/DashboardPage.vue"]
+        frontend_src_pages_dashboardpage_7f2526ff("DashboardPage.vue")
+        frontend_src_pages_dashboardpage_stats_5442b64b("stats<br/><small>src/pages/DashboardPage.vue</small>")
+    end
+    subgraph serve_api_src_router_index_js_fb65a551["src/router/index.js"]
+        frontend_src_router_index_ad797514("index.js")
+        frontend_src_router_index_router_0ba2bdb0("router<br/><small>src/router/index.js</small>")
+    end
+    frontend_src_main_c1980e55("main.js")
+    frontend_src_pages_requisitiondetailpage_ca7adc38("RequisitionDetailPage.vue")
+    frontend_src_pages_requisitionlistpage_bcb097c6("RequisitionListPage.vue")
+    frontend_src_pages_requisitioncreatepage_addline_867f4c09 -->|calls| frontend_src_pages_requisitioncreatepage_emptyli_6c661a49
+    frontend_src_main_c1980e55 -->|imports| frontend_src_router_index_router_0ba2bdb0
+    frontend_src_main_c1980e55 -->|imports| frontend_src_app_7da8908b
+    frontend_src_main_c1980e55 -->|imports| frontend_src_router_index_ad797514
+    frontend_src_pages_dashboardpage_7f2526ff -->|imports| frontend_src_api_api_ec67b69b
+    frontend_src_pages_dashboardpage_7f2526ff -->|imports| frontend_src_api_c5c4f956
+    frontend_src_pages_requisitioncreatepage_9720cb43 -->|imports| frontend_src_api_api_ec67b69b
+    frontend_src_pages_requisitioncreatepage_9720cb43 -->|imports| frontend_src_api_c5c4f956
+    frontend_src_pages_requisitiondetailpage_ca7adc38 -->|imports| frontend_src_api_api_ec67b69b
+    frontend_src_pages_requisitiondetailpage_ca7adc38 -->|imports| frontend_src_api_c5c4f956
+    frontend_src_pages_requisitionlistpage_bcb097c6 -->|imports| frontend_src_api_api_ec67b69b
+    frontend_src_pages_requisitionlistpage_bcb097c6 -->|imports| frontend_src_api_c5c4f956
+    frontend_src_router_index_ad797514 -->|imports| frontend_src_pages_dashboardpage_7f2526ff
+    frontend_src_router_index_ad797514 -->|imports| frontend_src_pages_requisitionlistpage_bcb097c6
+    frontend_src_router_index_ad797514 -->|imports| frontend_src_pages_requisitioncreatepage_9720cb43
+    frontend_src_router_index_ad797514 -->|imports| frontend_src_pages_requisitiondetailpage_ca7adc38
+    %% Omitted for readability: 13 nodes, 0 edges
+    class frontend_src_app_7da8908b ui;
+    class frontend_src_app_isdashboard_f319df13 ui;
+    class frontend_src_app_isrequisitions_0ea7c265 ui;
+    class frontend_src_app_route_2a6709b5 api;
+    class frontend_src_pages_requisitioncreatepage_9720cb43 ui;
+    class frontend_src_pages_requisitioncreatepage_addline_867f4c09 ui;
+    class frontend_src_pages_requisitioncreatepage_emptyli_6c661a49 ui;
+    class frontend_src_pages_requisitioncreatepage_errorme_f235a113 ui;
+    class frontend_src_api_api_ec67b69b api;
+    class frontend_src_api_c5c4f956 api;
+    class frontend_src_api_apifetch_0cb412a6 api;
+    class frontend_src_pages_dashboardpage_7f2526ff ui;
+    class frontend_src_pages_dashboardpage_stats_5442b64b ui;
+    class frontend_src_router_index_ad797514 module;
+    class frontend_src_router_index_router_0ba2bdb0 api;
+    class frontend_src_main_c1980e55 module;
+    class frontend_src_pages_requisitiondetailpage_ca7adc38 ui;
+    class frontend_src_pages_requisitionlistpage_bcb097c6 ui;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>apiFetch()</code><br><small style="color:var(--muted)">frontend/src/api.js</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>apiFetch() node in frontend/src/api.js.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>addLine()</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>emptyLine()</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small></td>
+  <td>addLine() node in src/pages/RequisitionCreatePage.vue.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>emptyLine()</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>addLine()</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small></td>
+  <td>No direct outbound edge</td>
+  <td>emptyLine() node in src/pages/RequisitionCreatePage.vue.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>handleSubmit()</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>handleSubmit() node in src/pages/RequisitionCreatePage.vue.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>removeLine()</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>removeLine() node in src/pages/RequisitionCreatePage.vue.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>approveRequisition()</code><br><small style="color:var(--muted)">src/pages/RequisitionDetailPage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>approveRequisition() node in src/pages/RequisitionDetailPage.vue.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>load()</code><br><small style="color:var(--muted)">src/pages/RequisitionDetailPage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>RequisitionDetailPage.vue</code><br><small style="color:var(--muted)">src/pages/RequisitionDetailPage.vue</small></td>
+  <td>No direct outbound edge</td>
+  <td>load() node in src/pages/RequisitionDetailPage.vue.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>submitRequisition()</code><br><small style="color:var(--muted)">src/pages/RequisitionDetailPage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>submitRequisition() node in src/pages/RequisitionDetailPage.vue.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>api.js</code><br><small style="color:var(--muted)">frontend/src/api.js</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td><code>DashboardPage.vue</code><br><small style="color:var(--muted)">src/pages/DashboardPage.vue</small><br><code>RequisitionCreatePage.vue</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small><br><code>RequisitionDetailPage.vue</code><br><small style="color:var(--muted)">src/pages/RequisitionDetailPage.vue</small><br>+1 more</td>
+  <td>No direct outbound edge</td>
+  <td>api.js node in frontend/src/api.js.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>api</code><br><small style="color:var(--muted)">frontend/src/api.js</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td><code>DashboardPage.vue</code><br><small style="color:var(--muted)">src/pages/DashboardPage.vue</small><br><code>RequisitionCreatePage.vue</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small><br><code>RequisitionDetailPage.vue</code><br><small style="color:var(--muted)">src/pages/RequisitionDetailPage.vue</small><br>+1 more</td>
+  <td>No direct outbound edge</td>
+  <td>api node in frontend/src/api.js.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>App.vue</code><br><small style="color:var(--muted)">frontend/src/App.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>main.js</code><br><small style="color:var(--muted)">frontend/src/main.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>App.vue node in frontend/src/App.vue.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>isDashboard</code><br><small style="color:var(--muted)">frontend/src/App.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>isDashboard node in frontend/src/App.vue.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>isRequisitions</code><br><small style="color:var(--muted)">frontend/src/App.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>isRequisitions node in frontend/src/App.vue.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>route</code><br><small style="color:var(--muted)">frontend/src/App.vue</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>route node in frontend/src/App.vue.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>main.js</code><br><small style="color:var(--muted)">frontend/src/main.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>App.vue</code><br><small style="color:var(--muted)">frontend/src/App.vue</small><br><code>index.js</code><br><small style="color:var(--muted)">src/router/index.js</small><br><code>router</code><br><small style="color:var(--muted)">src/router/index.js</small></td>
+  <td>main.js node in frontend/src/main.js.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>DashboardPage.vue</code><br><small style="color:var(--muted)">src/pages/DashboardPage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>index.js</code><br><small style="color:var(--muted)">src/router/index.js</small></td>
+  <td><code>api</code><br><small style="color:var(--muted)">frontend/src/api.js</small><br><code>api.js</code><br><small style="color:var(--muted)">frontend/src/api.js</small></td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>stats</code><br><small style="color:var(--muted)">src/pages/DashboardPage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>stats node in src/pages/DashboardPage.vue.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>RequisitionCreatePage.vue</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>index.js</code><br><small style="color:var(--muted)">src/router/index.js</small></td>
+  <td><code>api</code><br><small style="color:var(--muted)">frontend/src/api.js</small><br><code>api.js</code><br><small style="color:var(--muted)">frontend/src/api.js</small></td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>errorMessage</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>errorMessage node in src/pages/RequisitionCreatePage.vue.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>form</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>form node in src/pages/RequisitionCreatePage.vue.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>router</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>router node in src/pages/RequisitionCreatePage.vue.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>RequisitionDetailPage.vue</code><br><small style="color:var(--muted)">src/pages/RequisitionDetailPage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>index.js</code><br><small style="color:var(--muted)">src/router/index.js</small></td>
+  <td><code>api</code><br><small style="color:var(--muted)">frontend/src/api.js</small><br><code>api.js</code><br><small style="color:var(--muted)">frontend/src/api.js</small><br><code>load()</code><br><small style="color:var(--muted)">src/pages/RequisitionDetailPage.vue</small></td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>errorMessage</code><br><small style="color:var(--muted)">src/pages/RequisitionDetailPage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>errorMessage node in src/pages/RequisitionDetailPage.vue.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>requisition</code><br><small style="color:var(--muted)">src/pages/RequisitionDetailPage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>requisition node in src/pages/RequisitionDetailPage.vue.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>route</code><br><small style="color:var(--muted)">src/pages/RequisitionDetailPage.vue</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>route node in src/pages/RequisitionDetailPage.vue.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>RequisitionListPage.vue</code><br><small style="color:var(--muted)">src/pages/RequisitionListPage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>index.js</code><br><small style="color:var(--muted)">src/router/index.js</small></td>
+  <td><code>api</code><br><small style="color:var(--muted)">frontend/src/api.js</small><br><code>api.js</code><br><small style="color:var(--muted)">frontend/src/api.js</small></td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>errorMessage</code><br><small style="color:var(--muted)">src/pages/RequisitionListPage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>errorMessage node in src/pages/RequisitionListPage.vue.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>items</code><br><small style="color:var(--muted)">src/pages/RequisitionListPage.vue</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>items node in src/pages/RequisitionListPage.vue.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>index.js</code><br><small style="color:var(--muted)">src/router/index.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>main.js</code><br><small style="color:var(--muted)">frontend/src/main.js</small></td>
+  <td><code>DashboardPage.vue</code><br><small style="color:var(--muted)">src/pages/DashboardPage.vue</small><br><code>RequisitionCreatePage.vue</code><br><small style="color:var(--muted)">src/pages/RequisitionCreatePage.vue</small><br><code>RequisitionDetailPage.vue</code><br><small style="color:var(--muted)">src/pages/RequisitionDetailPage.vue</small><br>+1 more</td>
+  <td>index.js node in src/router/index.js.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>router</code><br><small style="color:var(--muted)">src/router/index.js</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td><code>main.js</code><br><small style="color:var(--muted)">frontend/src/main.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>router node in src/router/index.js.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>src/pages/RequisitionCreatePage.vue</code></td><td>8 nodes</td></tr>
+<tr><td><code>src/pages/RequisitionDetailPage.vue</code></td><td>7 nodes</td></tr>
+<tr><td><code>frontend/src/App.vue</code></td><td>4 nodes</td></tr>
+<tr><td><code>frontend/src/api.js</code></td><td>3 nodes</td></tr>
+<tr><td><code>src/pages/RequisitionListPage.vue</code></td><td>3 nodes</td></tr>
+<tr><td><code>src/router/index.js</code></td><td>3 nodes</td></tr>
+<tr><td><code>src/pages/DashboardPage.vue</code></td><td>2 nodes</td></tr>
+<tr><td><code>frontend/src/main.js</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x22, imports x10, imports x5, calls x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 4. Tests & Fixtures ====== -->
+<h2 id="tests-fixtures">4. Tests &amp; Fixtures</h2>
+<p>Tests &amp; Fixtures groups implementation around backend, services, servicejs, purchase, mostly in src/services/requisition-service.js, src/services/purchase-order-service.js, tests/services/purchase-order-service.test.js. This section covers 33 nodes and 76 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Tests &amp; Fixtures (33 nodes, 76 edges)
+    subgraph tests_fixtures_src_services_purchase_order_servi_66dd7287["src/services/purchase-order-service.js"]
+        backend_src_services_purchase_order_service_list_c2a27c3f("listPurchaseOrders()<br/><small>src/services/purchase-order-service.js</small>")
+        backend_src_services_purchase_order_service_crea_d00bd4a5("createPurchaseOrder()<br/><small>src/services/purchase-order-service.js</small>")
+        backend_src_services_purchase_order_service_subm_61f35d4a("submitPurchaseOrder()<br/><small>src/services/purchase-order-service.js</small>")
+        backend_src_services_purchase_order_service_getp_14818b8b("getPurchaseOrderById()<br/><small>src/services/purchase-order-service.js</small>")
+        backend_src_services_purchase_order_service_geto_f40c44b0("getOpenPoLines()<br/><small>src/services/purchase-order-service.js</small>")
+        backend_src_services_purchase_order_service_vali_639a5277("validateCreatePayload()<br/><small>src/services/purchase-order-service.js</small>")
+        backend_src_services_purchase_order_service_crea_e33ec248("createPoNumber()<br/><small>src/services/purchase-order-service.js</small>")
+        backend_src_services_purchase_order_service_mapl_09a8503b("mapLine()<br/><small>src/services/purchase-order-service.js</small>")
+        backend_src_services_purchase_order_service_maph_c9561265("mapHeader()<br/><small>src/services/purchase-order-service.js</small>")
+    end
+    subgraph tests_fixtures_src_services_requisition_service_5515d677["src/services/requisition-service.js"]
+        backend_src_services_requisition_service_listreq_f7f664f2("listRequisitions()<br/><small>src/services/requisition-service.js</small>")
+        backend_src_services_requisition_service_creater_3625b067("createRequisition()<br/><small>src/services/requisition-service.js</small>")
+        backend_src_services_requisition_service_submitr_1cde4703("submitRequisition()<br/><small>src/services/requisition-service.js</small>")
+    end
+    subgraph tests_fixtures_src_routes_purchase_order_routes_0cc25214["src/routes/purchase-order-routes.js"]
+        backend_src_routes_purchase_order_routes_f3c0c054("purchase-order-routes.js")
+        backend_src_routes_purchase_order_routes_purchas_4d16c34c("purchaseOrderRoutes()<br/><small>src/routes/purchase-order-routes.js</small>")
+    end
+    subgraph tests_fixtures_src_routes_requisition_routes_js_a4be465e["src/routes/requisition-routes.js"]
+        backend_src_routes_requisition_routes_1840fc9f("requisition-routes.js")
+        backend_src_routes_requisition_routes_requisitio_923777fa("requisitionRoutes()<br/><small>src/routes/requisition-routes.js</small>")
+    end
+    backend_tests_services_purchase_order_service_te_bd696225("purchase-order-service.test.js")
+    backend_tests_services_requisition_service_test_69fb149c("requisition-service.test.js")
+    backend_src_routes_purchase_order_routes_purchas_4d16c34c -->|calls| backend_src_services_purchase_order_service_list_c2a27c3f
+    backend_src_routes_purchase_order_routes_purchas_4d16c34c -->|calls| backend_src_services_purchase_order_service_crea_d00bd4a5
+    backend_src_routes_purchase_order_routes_purchas_4d16c34c -->|calls| backend_src_services_purchase_order_service_subm_61f35d4a
+    backend_src_routes_purchase_order_routes_purchas_4d16c34c -->|calls| backend_src_services_purchase_order_service_getp_14818b8b
+    backend_src_routes_purchase_order_routes_purchas_4d16c34c -->|calls| backend_src_services_purchase_order_service_geto_f40c44b0
+    backend_src_services_purchase_order_service_crea_d00bd4a5 -->|calls| backend_src_services_purchase_order_service_vali_639a5277
+    backend_src_services_purchase_order_service_crea_d00bd4a5 -->|calls| backend_src_services_purchase_order_service_crea_e33ec248
+    backend_src_services_purchase_order_service_crea_d00bd4a5 -->|calls| backend_src_services_purchase_order_service_getp_14818b8b
+    backend_src_services_purchase_order_service_getp_14818b8b -->|calls| backend_src_services_purchase_order_service_mapl_09a8503b
+    backend_src_services_purchase_order_service_getp_14818b8b -->|calls| backend_src_services_purchase_order_service_maph_c9561265
+    backend_src_services_purchase_order_service_subm_61f35d4a -->|calls| backend_src_services_purchase_order_service_getp_14818b8b
+    backend_src_routes_requisition_routes_requisitio_923777fa -->|calls| backend_src_services_requisition_service_listreq_f7f664f2
+    backend_src_routes_requisition_routes_requisitio_923777fa -->|calls| backend_src_services_requisition_service_creater_3625b067
+    backend_src_routes_requisition_routes_requisitio_923777fa -->|calls| backend_src_services_requisition_service_submitr_1cde4703
+    backend_src_routes_purchase_order_routes_f3c0c054 -->|imports| backend_src_services_purchase_order_service_crea_d00bd4a5
+    backend_src_routes_purchase_order_routes_f3c0c054 -->|imports| backend_src_services_purchase_order_service_geto_f40c44b0
+    backend_src_routes_purchase_order_routes_f3c0c054 -->|imports| backend_src_services_purchase_order_service_getp_14818b8b
+    backend_src_routes_purchase_order_routes_f3c0c054 -->|imports| backend_src_services_purchase_order_service_list_c2a27c3f
+    backend_src_routes_purchase_order_routes_f3c0c054 -->|imports| backend_src_services_purchase_order_service_subm_61f35d4a
+    backend_tests_services_purchase_order_service_te_bd696225 -->|imports| backend_src_services_purchase_order_service_crea_d00bd4a5
+    backend_tests_services_purchase_order_service_te_bd696225 -->|imports| backend_src_services_purchase_order_service_geto_f40c44b0
+    backend_tests_services_purchase_order_service_te_bd696225 -->|imports| backend_src_services_purchase_order_service_list_c2a27c3f
+    backend_tests_services_purchase_order_service_te_bd696225 -->|imports| backend_src_services_purchase_order_service_subm_61f35d4a
+    backend_src_routes_requisition_routes_1840fc9f -->|imports| backend_src_services_requisition_service_creater_3625b067
+    %% Omitted for readability: 15 nodes, 3 edges
+    class backend_src_services_purchase_order_service_list_c2a27c3f function;
+    class backend_src_services_purchase_order_service_crea_d00bd4a5 function;
+    class backend_src_services_purchase_order_service_subm_61f35d4a function;
+    class backend_src_services_purchase_order_service_getp_14818b8b function;
+    class backend_src_services_purchase_order_service_geto_f40c44b0 function;
+    class backend_src_services_purchase_order_service_vali_639a5277 function;
+    class backend_src_services_purchase_order_service_crea_e33ec248 function;
+    class backend_src_services_purchase_order_service_mapl_09a8503b function;
+    class backend_src_services_purchase_order_service_maph_c9561265 function;
+    class backend_src_services_requisition_service_listreq_f7f664f2 function;
+    class backend_src_services_requisition_service_creater_3625b067 function;
+    class backend_src_services_requisition_service_submitr_1cde4703 function;
+    class backend_src_routes_purchase_order_routes_f3c0c054 api;
+    class backend_src_routes_purchase_order_routes_purchas_4d16c34c api;
+    class backend_src_routes_requisition_routes_1840fc9f api;
+    class backend_src_routes_requisition_routes_requisitio_923777fa api;
+    class backend_tests_services_purchase_order_service_te_bd696225 test;
+    class backend_tests_services_requisition_service_test_69fb149c test;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>purchaseOrderRoutes()</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td><code>app.js</code><br><small style="color:var(--muted)">backend/src/app.js</small><br><code>buildApp()</code><br><small style="color:var(--muted)">backend/src/app.js</small></td>
+  <td><code>createPurchaseOrder()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br><code>getOpenPoLines()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br><code>getPurchaseOrderById()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br>+2 more</td>
+  <td>purchaseOrderRoutes() node in src/routes/purchase-order-routes.js.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>createPoNumber()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>createPurchaseOrder()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>createPoNumber() node in src/services/purchase-order-service.js.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>createPurchaseOrder()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>purchase-order-routes.js</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small><br><code>purchase-order-service.test.js</code><br><small style="color:var(--muted)">tests/services/purchase-order-service.test.js</small><br><code>purchaseOrderRoutes()</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small></td>
+  <td><code>createPoNumber()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br><code>getPurchaseOrderById()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br><code>validateCreatePayload()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td>createPurchaseOrder() node in src/services/purchase-order-service.js.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>getOpenPoLines()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>purchase-order-routes.js</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small><br><code>purchase-order-service.test.js</code><br><small style="color:var(--muted)">tests/services/purchase-order-service.test.js</small><br><code>purchaseOrderRoutes()</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small></td>
+  <td><code>mapLine()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td>getOpenPoLines() node in src/services/purchase-order-service.js.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>getPurchaseOrderById()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>createPurchaseOrder()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br><code>purchase-order-routes.js</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small><br><code>purchaseOrderRoutes()</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small><br>+1 more</td>
+  <td><code>mapHeader()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br><code>mapLine()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td>getPurchaseOrderById() node in src/services/purchase-order-service.js.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>listPurchaseOrders()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>purchase-order-routes.js</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small><br><code>purchase-order-service.test.js</code><br><small style="color:var(--muted)">tests/services/purchase-order-service.test.js</small><br><code>purchaseOrderRoutes()</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small></td>
+  <td><code>mapHeader()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td>listPurchaseOrders() node in src/services/purchase-order-service.js.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>mapHeader()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getPurchaseOrderById()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br><code>listPurchaseOrders()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>mapHeader() node in src/services/purchase-order-service.js.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>mapLine()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getOpenPoLines()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br><code>getPurchaseOrderById()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>mapLine() node in src/services/purchase-order-service.js.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>submitPurchaseOrder()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>purchase-order-routes.js</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small><br><code>purchase-order-service.test.js</code><br><small style="color:var(--muted)">tests/services/purchase-order-service.test.js</small><br><code>purchaseOrderRoutes()</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small></td>
+  <td><code>getPurchaseOrderById()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td>submitPurchaseOrder() node in src/services/purchase-order-service.js.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>validateCreatePayload()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>createPurchaseOrder()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>validateCreatePayload() node in src/services/purchase-order-service.js.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>detailQueryResponses()</code><br><small style="color:var(--muted)">tests/services/purchase-order-service.test.js</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>detailQueryResponses() node in tests/services/purchase-order-service.test.js.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>happyPathClientResponses()</code><br><small style="color:var(--muted)">tests/services/purchase-order-service.test.js</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>happyPathClientResponses() node in tests/services/purchase-order-service.test.js.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>mockClient()</code><br><small style="color:var(--muted)">tests/services/purchase-order-service.test.js</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>mockClient() node in tests/services/purchase-order-service.test.js.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>mockDb()</code><br><small style="color:var(--muted)">tests/services/purchase-order-service.test.js</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>mockDb() node in tests/services/purchase-order-service.test.js.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>validPayload()</code><br><small style="color:var(--muted)">tests/services/purchase-order-service.test.js</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>validPayload() node in tests/services/purchase-order-service.test.js.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>purchase-order-routes.js</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td><code>app.js</code><br><small style="color:var(--muted)">backend/src/app.js</small></td>
+  <td><code>createPurchaseOrder()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br><code>getOpenPoLines()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br><code>getPurchaseOrderById()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br>+3 more</td>
+  <td>purchase-order-routes.js node in src/routes/purchase-order-routes.js.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>purchase-order-service.js</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>purchase-order-routes.js</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small><br><code>purchase-order-service.test.js</code><br><small style="color:var(--muted)">tests/services/purchase-order-service.test.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>purchase-order-service.js node in src/services/purchase-order-service.js.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>purchase-order-service.test.js</code><br><small style="color:var(--muted)">tests/services/purchase-order-service.test.js</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>createPurchaseOrder()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br><code>getOpenPoLines()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br><code>listPurchaseOrders()</code><br><small style="color:var(--muted)">src/services/purchase-order-service.js</small><br>+2 more</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>requisitionRoutes()</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td><code>app.js</code><br><small style="color:var(--muted)">backend/src/app.js</small><br><code>buildApp()</code><br><small style="color:var(--muted)">backend/src/app.js</small></td>
+  <td><code>approveRequisition()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small><br><code>createRequisition()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small><br><code>getRequisitionById()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small><br>+3 more</td>
+  <td>requisitionRoutes() node in src/routes/requisition-routes.js.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>approveRequisition()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>requisition-routes.js</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small><br><code>requisitionRoutes()</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small></td>
+  <td><code>getRequisitionById()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td>approveRequisition() node in src/services/requisition-service.js.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>createPrNumber()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>createRequisition()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>createPrNumber() node in src/services/requisition-service.js.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>createRequisition()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>requisition-routes.js</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small><br><code>requisitionRoutes()</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small></td>
+  <td><code>createPrNumber()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small><br><code>getRequisitionById()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small><br><code>validateCreatePayload()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td>createRequisition() node in src/services/requisition-service.js.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>getRequisitionById()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>approveRequisition()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small><br><code>createRequisition()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small><br><code>requisition-routes.js</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small><br>+2 more</td>
+  <td><code>mapHeader()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small><br><code>mapLine()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td>getRequisitionById() node in src/services/requisition-service.js.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>getRequisitionOpenLines()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>requisition-routes.js</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small><br><code>requisition-service.test.js</code><br><small style="color:var(--muted)">tests/services/requisition-service.test.js</small><br><code>requisitionRoutes()</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small></td>
+  <td><code>mapLine()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td>getRequisitionOpenLines() node in src/services/requisition-service.js.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>listRequisitions()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>requisition-routes.js</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small><br><code>requisition-service.test.js</code><br><small style="color:var(--muted)">tests/services/requisition-service.test.js</small><br><code>requisitionRoutes()</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small></td>
+  <td><code>mapHeader()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td>listRequisitions() node in src/services/requisition-service.js.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>mapHeader()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getRequisitionById()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small><br><code>listRequisitions()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>mapHeader() node in src/services/requisition-service.js.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>mapLine()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getRequisitionById()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small><br><code>getRequisitionOpenLines()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>mapLine() node in src/services/requisition-service.js.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>submitRequisition()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>requisition-routes.js</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small><br><code>requisitionRoutes()</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small></td>
+  <td><code>getRequisitionById()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td>submitRequisition() node in src/services/requisition-service.js.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>validateCreatePayload()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>createRequisition()</code><br><small style="color:var(--muted)">src/services/requisition-service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>validateCreatePayload() node in src/services/requisition-service.js.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>mockDb()</code><br><small style="color:var(--muted)">tests/services/requisition-service.test.js</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>mockDb() node in tests/services/requisition-service.test.js.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>src/services/requisition-service.js</code></td><td>11 nodes</td></tr>
+<tr><td><code>src/services/purchase-order-service.js</code></td><td>10 nodes</td></tr>
+<tr><td><code>tests/services/purchase-order-service.test.js</code></td><td>6 nodes</td></tr>
+<tr><td><code>src/routes/purchase-order-routes.js</code></td><td>2 nodes</td></tr>
+<tr><td><code>src/routes/requisition-routes.js</code></td><td>2 nodes</td></tr>
+<tr><td><code>tests/services/requisition-service.test.js</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x27, calls x23, imports x17, indirect call x5. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 5. Backend Appjs Dbjs ====== -->
+<h2 id="backend-appjs-dbjs">5. Backend Appjs Dbjs</h2>
+<p>Backend Appjs Dbjs groups implementation around backend, appjs, dbjs, serverjs, mostly in backend/src/app.js, src/plugins/db.js, backend/src/server.js. This section covers 8 nodes and 13 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Backend Appjs Dbjs (8 nodes, 13 edges)
+    subgraph backend_appjs_dbjs_backend_src_app_js_b89eb8ac["backend/src/app.js"]
+        backend_src_app_8bc6e428("app.js")
+        backend_src_app_buildapp_cb589ee5("buildApp()<br/><small>backend/src/app.js</small>")
+    end
+    subgraph backend_appjs_dbjs_backend_src_config_js_096e6394["backend/src/config.js"]
+        backend_src_config_config_d6c68041("config<br/><small>backend/src/config.js</small>")
+        backend_src_config_fe7db47a("config.js")
+    end
+    subgraph backend_appjs_dbjs_backend_src_server_js_0a047a98["backend/src/server.js"]
+        backend_src_server_4583d7de("server.js")
+        backend_src_server_start_84b66bf5("start()<br/><small>backend/src/server.js</small>")
+    end
+    subgraph backend_appjs_dbjs_src_plugins_db_js_6fcd41ce["src/plugins/db.js"]
+        backend_src_plugins_db_1c1645f8("db.js")
+        backend_src_plugins_db_dbplugin_10e44b6d("dbPlugin()<br/><small>src/plugins/db.js</small>")
+    end
+    backend_src_server_start_84b66bf5 -->|calls| backend_src_app_buildapp_cb589ee5
+    backend_src_app_8bc6e428 -->|imports| backend_src_plugins_db_1c1645f8
+    backend_src_plugins_db_1c1645f8 -->|imports| backend_src_config_config_d6c68041
+    backend_src_plugins_db_1c1645f8 -->|imports| backend_src_config_fe7db47a
+    backend_src_server_4583d7de -->|imports| backend_src_app_buildapp_cb589ee5
+    backend_src_server_4583d7de -->|imports| backend_src_config_config_d6c68041
+    backend_src_server_4583d7de -->|imports| backend_src_app_8bc6e428
+    backend_src_server_4583d7de -->|imports| backend_src_config_fe7db47a
+    class backend_src_app_8bc6e428 module;
+    class backend_src_app_buildapp_cb589ee5 function;
+    class backend_src_config_config_d6c68041 function;
+    class backend_src_config_fe7db47a module;
+    class backend_src_server_4583d7de module;
+    class backend_src_server_start_84b66bf5 function;
+    class backend_src_plugins_db_1c1645f8 module;
+    class backend_src_plugins_db_dbplugin_10e44b6d function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>buildApp()</code><br><small style="color:var(--muted)">backend/src/app.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>server.js</code><br><small style="color:var(--muted)">backend/src/server.js</small><br><code>start()</code><br><small style="color:var(--muted)">backend/src/server.js</small></td>
+  <td><code>dbPlugin()</code><br><small style="color:var(--muted)">src/plugins/db.js</small><br><code>purchaseOrderRoutes()</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small><br><code>requisitionRoutes()</code><br><small style="color:var(--muted)">src/routes/requisition-routes.js</small></td>
+  <td>buildApp() node in backend/src/app.js.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>dbPlugin()</code><br><small style="color:var(--muted)">src/plugins/db.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>buildApp()</code><br><small style="color:var(--muted)">backend/src/app.js</small><br><code>db.js</code><br><small style="color:var(--muted)">src/plugins/db.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>dbPlugin() node in src/plugins/db.js.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>start()</code><br><small style="color:var(--muted)">backend/src/server.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>buildApp()</code><br><small style="color:var(--muted)">backend/src/app.js</small></td>
+  <td>start() node in backend/src/server.js.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>app.js</code><br><small style="color:var(--muted)">backend/src/app.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>server.js</code><br><small style="color:var(--muted)">backend/src/server.js</small></td>
+  <td><code>db.js</code><br><small style="color:var(--muted)">src/plugins/db.js</small><br><code>purchase-order-routes.js</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small><br><code>purchaseOrderRoutes()</code><br><small style="color:var(--muted)">src/routes/purchase-order-routes.js</small><br>+2 more</td>
+  <td>app.js node in backend/src/app.js.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>config.js</code><br><small style="color:var(--muted)">backend/src/config.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>db.js</code><br><small style="color:var(--muted)">src/plugins/db.js</small><br><code>server.js</code><br><small style="color:var(--muted)">backend/src/server.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>config</code><br><small style="color:var(--muted)">backend/src/config.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>db.js</code><br><small style="color:var(--muted)">src/plugins/db.js</small><br><code>server.js</code><br><small style="color:var(--muted)">backend/src/server.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>db.js</code><br><small style="color:var(--muted)">src/plugins/db.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>app.js</code><br><small style="color:var(--muted)">backend/src/app.js</small></td>
+  <td><code>config</code><br><small style="color:var(--muted)">backend/src/config.js</small><br><code>config.js</code><br><small style="color:var(--muted)">backend/src/config.js</small><br><code>dbPlugin()</code><br><small style="color:var(--muted)">src/plugins/db.js</small></td>
+  <td>db.js node in src/plugins/db.js.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>server.js</code><br><small style="color:var(--muted)">backend/src/server.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>app.js</code><br><small style="color:var(--muted)">backend/src/app.js</small><br><code>buildApp()</code><br><small style="color:var(--muted)">backend/src/app.js</small><br><code>config</code><br><small style="color:var(--muted)">backend/src/config.js</small><br>+1 more</td>
+  <td>server.js node in backend/src/server.js.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>backend/src/app.js</code></td><td>2 nodes</td></tr>
+<tr><td><code>backend/src/config.js</code></td><td>2 nodes</td></tr>
+<tr><td><code>src/plugins/db.js</code></td><td>2 nodes</td></tr>
+<tr><td><code>backend/src/server.js</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: imports x4, contains x3, imports x3, indirect call x2. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 6. Mvp Dbsh Docker ====== -->
+<h2 id="mvp-dbsh-docker">6. Mvp Dbsh Docker</h2>
+<p>Mvp Dbsh Docker groups implementation around mvp, dbsh, docker, postgres, mostly in postgres/init/00-init-mvp-db.sh. This section covers 2 nodes and 1 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Mvp Dbsh Docker (2 nodes, 1 edges)
+    docker_postgres_init_00_init_mvp_db_460d9893("00-init-mvp-db.sh")
+    docker_postgres_init_00_init_mvp_db_sh_entry_99ba4bd3("00-init-mvp-db.sh script<br/><small>postgres/init/00-init-mvp-db.sh</small>")
+    docker_postgres_init_00_init_mvp_db_460d9893 -->|contains| docker_postgres_init_00_init_mvp_db_sh_entry_99ba4bd3
+    class docker_postgres_init_00_init_mvp_db_460d9893 function;
+    class docker_postgres_init_00_init_mvp_db_sh_entry_99ba4bd3 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>00-init-mvp-db.sh</code><br><small style="color:var(--muted)">postgres/init/00-init-mvp-db.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>00-init-mvp-db.sh node in postgres/init/00-init-mvp-db.sh.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>00-init-mvp-db.sh script</code><br><small style="color:var(--muted)">postgres/init/00-init-mvp-db.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>00-init-mvp-db.sh script node in postgres/init/00-init-mvp-db.sh.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>postgres/init/00-init-mvp-db.sh</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 7. Playwrightconfigjs Defineconfig ====== -->
+<h2 id="playwrightconfigjs-defineconfig">7. Playwrightconfigjs Defineconfig</h2>
+<p>Playwrightconfigjs Defineconfig groups implementation around playwrightconfigjs, defineconfig, mostly in playwright.config.js. This section covers 2 nodes and 1 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Playwrightconfigjs Defineconfig (2 nodes, 1 edges)
+    playwright_config_c36f32bb("playwright.config.js")
+    playwright_config_defineconfig_91ff1084("defineConfig<br/><small>playwright.config.js</small>")
+    playwright_config_c36f32bb -->|contains| playwright_config_defineconfig_91ff1084
+    class playwright_config_c36f32bb module;
+    class playwright_config_defineconfig_91ff1084 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>playwright.config.js</code><br><small style="color:var(--muted)">playwright.config.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>{ defineConfig }</code><br><small style="color:var(--muted)">playwright.config.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>playwright.config.js</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 8. Jestconfigjs Backend ====== -->
+<h2 id="jestconfigjs-backend">8. Jestconfigjs Backend</h2>
+<p>Jestconfigjs Backend groups implementation around jestconfigjs, backend, mostly in backend/jest.config.js. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Jestconfigjs Backend (1 nodes, 0 edges)
+    backend_jest_config_a51150b9("jest.config.js")
+    class backend_jest_config_a51150b9 module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>jest.config.js</code><br><small style="color:var(--muted)">backend/jest.config.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>backend/jest.config.js</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 9. Viteconfigjs Frontend ====== -->
+<h2 id="viteconfigjs-frontend">9. Viteconfigjs Frontend</h2>
+<p>Viteconfigjs Frontend groups implementation around viteconfigjs, frontend, mostly in frontend/vite.config.js. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Viteconfigjs Frontend (1 nodes, 0 edges)
+    frontend_vite_config_3ac59d22("vite.config.js")
+    class frontend_vite_config_3ac59d22 module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>vite.config.js</code><br><small style="color:var(--muted)">frontend/vite.config.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>frontend/vite.config.js</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<h2 id="stats">Project Statistics</h2>
+
+<div class="grid">
+  <div class="card">
+    <h4>Graph</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>Nodes</td><td>162</td></tr>
+      <tr><td>Edges</td><td>217</td></tr>
+      <tr><td>Hyperedges</td><td>0</td></tr>
+      <tr><td>Communities</td><td>14</td></tr>
+      <tr><td>Documented Sections</td><td>8</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Edge Confidence</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>EXTRACTED</td><td>207</td></tr>
+      <tr><td>INFERRED</td><td>10</td></tr>
+      <tr><td>AMBIGUOUS</td><td>0</td></tr>
+    </table>
+  </div>
+</div>
+
+<div style="text-align:center; padding:40px 0; color: var(--muted); font-size:0.9rem;">
+  <p>2026-github-copilot-workshop — Architecture Documentation</p>
+  <p>Generated: 2026-09-02 07:08 UTC · graphify callflow-html</p>
+</div>
+
+</div><!-- .container -->
+
+<script>
+(function () {
+  const mermaidConfig = {
+    startOnLoad: false,
+    theme: 'dark',
+    securityLevel: 'loose',
+    flowchart: { htmlLabels: true, useMaxWidth: true },
+    themeVariables: {
+      primaryColor: '#1e293b',
+      primaryTextColor: '#e2e8f0',
+      primaryBorderColor: '#38bdf8',
+      secondaryColor: '#0f172a',
+      tertiaryColor: '#334155',
+      lineColor: '#64748b',
+      textColor: '#e2e8f0',
+    }
+  };
+
+  mermaid.initialize(mermaidConfig);
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function enhanceMermaidDiagrams() {
+    document.querySelectorAll('.mermaid').forEach((container) => {
+      if (container.dataset.zoomReady === 'true') return;
+      const svg = container.querySelector('svg');
+      if (!svg) return;
+
+      container.dataset.zoomReady = 'true';
+      container.classList.add('is-enhanced');
+
+      const viewport = document.createElement('div');
+      viewport.className = 'mermaid-viewport';
+      svg.parentNode.insertBefore(viewport, svg);
+      viewport.appendChild(svg);
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'mermaid-toolbar';
+      toolbar.innerHTML = [
+        '<button type="button" data-action="zoom-out" title="Zoom out">-</button>',
+        '<span class="zoom-level" data-role="level">100%</span>',
+        '<button type="button" data-action="zoom-in" title="Zoom in">+</button>',
+        '<button type="button" data-action="fit" title="Fit width">Fit</button>',
+        '<button type="button" data-action="reset" title="Reset view">Reset</button>'
+      ].join('');
+      container.insertBefore(toolbar, viewport);
+
+      const state = { scale: 1, x: 0, y: 0, dragging: false, startX: 0, startY: 0, originX: 0, originY: 0 };
+      const level = toolbar.querySelector('[data-role="level"]');
+
+      function applyTransform() {
+        svg.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+        level.textContent = `${Math.round(state.scale * 100)}%`;
+      }
+
+      function zoomBy(delta) {
+        state.scale = clamp(state.scale + delta, 0.25, 3);
+        applyTransform();
+      }
+
+      function reset() {
+        state.scale = 1;
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      function fitWidth() {
+        const rawWidth = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width
+          ? svg.viewBox.baseVal.width
+          : svg.getBoundingClientRect().width / state.scale;
+        if (!rawWidth) {
+          reset();
+          return;
+        }
+        state.scale = clamp((viewport.clientWidth - 48) / rawWidth, 0.25, 1.4);
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      toolbar.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        if (action === 'zoom-in') zoomBy(0.15);
+        if (action === 'zoom-out') zoomBy(-0.15);
+        if (action === 'fit') fitWidth();
+        if (action === 'reset') reset();
+      });
+
+      viewport.addEventListener('wheel', (event) => {
+        if (!event.ctrlKey && !event.metaKey) return;
+        event.preventDefault();
+        zoomBy(event.deltaY < 0 ? 0.1 : -0.1);
+      }, { passive: false });
+
+      viewport.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        state.dragging = true;
+        state.startX = event.clientX;
+        state.startY = event.clientY;
+        state.originX = state.x;
+        state.originY = state.y;
+        viewport.classList.add('is-dragging');
+        viewport.setPointerCapture(event.pointerId);
+      });
+
+      viewport.addEventListener('pointermove', (event) => {
+        if (!state.dragging) return;
+        state.x = state.originX + event.clientX - state.startX;
+        state.y = state.originY + event.clientY - state.startY;
+        applyTransform();
+      });
+
+      function endDrag(event) {
+        if (!state.dragging) return;
+        state.dragging = false;
+        viewport.classList.remove('is-dragging');
+        if (viewport.hasPointerCapture(event.pointerId)) {
+          viewport.releasePointerCapture(event.pointerId);
+        }
+      }
+
+      viewport.addEventListener('pointerup', endDrag);
+      viewport.addEventListener('pointercancel', endDrag);
+      applyTransform();
+    });
+  }
+
+  function renderMermaid() {
+    const result = mermaid.run
+      ? mermaid.run({ querySelector: '.mermaid' })
+      : Promise.resolve();
+    Promise.resolve(result)
+      .then(enhanceMermaidDiagrams)
+      .catch((error) => {
+        console.error('Mermaid render failed:', error);
+        enhanceMermaidDiagrams();
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderMermaid);
+  } else {
+    renderMermaid();
+  }
+})();
+</script>
+
+</body>
+</html>

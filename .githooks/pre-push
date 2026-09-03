@@ -1,0 +1,13 @@
+#!/bin/sh
+
+printf '%s\n' 'Running test suite before push...'
+npm test
+status=$?
+
+if [ "$status" -ne 0 ]; then
+  printf '%s\n' 'Push blocked: tests failed.' >&2
+  exit "$status"
+fi
+
+printf '%s\n' 'Tests passed. Push continues.'
+exit 0

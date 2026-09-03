@@ -1,0 +1,323 @@
+{
+  "communities": {
+    "0": [
+      "frontend_src_api",
+      "frontend_src_api_api",
+      "frontend_src_api_apifetch",
+      "frontend_src_app",
+      "frontend_src_app_isdashboard",
+      "frontend_src_app_isrequisitions",
+      "frontend_src_app_route",
+      "frontend_src_main",
+      "frontend_src_pages_dashboardpage",
+      "frontend_src_pages_dashboardpage_stats",
+      "frontend_src_pages_requisitioncreatepage",
+      "frontend_src_pages_requisitioncreatepage_addline",
+      "frontend_src_pages_requisitioncreatepage_emptyline",
+      "frontend_src_pages_requisitioncreatepage_errormessage",
+      "frontend_src_pages_requisitioncreatepage_form",
+      "frontend_src_pages_requisitioncreatepage_handlesubmit",
+      "frontend_src_pages_requisitioncreatepage_removeline",
+      "frontend_src_pages_requisitioncreatepage_router",
+      "frontend_src_pages_requisitiondetailpage",
+      "frontend_src_pages_requisitiondetailpage_approverequisition",
+      "frontend_src_pages_requisitiondetailpage_errormessage",
+      "frontend_src_pages_requisitiondetailpage_load",
+      "frontend_src_pages_requisitiondetailpage_requisition",
+      "frontend_src_pages_requisitiondetailpage_route",
+      "frontend_src_pages_requisitiondetailpage_submitrequisition",
+      "frontend_src_pages_requisitionlistpage",
+      "frontend_src_pages_requisitionlistpage_errormessage",
+      "frontend_src_pages_requisitionlistpage_items",
+      "frontend_src_router_index",
+      "frontend_src_router_index_router",
+      "frontend_src_router_index_routes"
+    ],
+    "1": [
+      "backend_src_routes_purchase_order_routes",
+      "backend_src_routes_purchase_order_routes_purchaseorderroutes",
+      "backend_src_services_purchase_order_service",
+      "backend_src_services_purchase_order_service_createponumber",
+      "backend_src_services_purchase_order_service_createpurchaseorder",
+      "backend_src_services_purchase_order_service_getopenpolines",
+      "backend_src_services_purchase_order_service_getpurchaseorderbyid",
+      "backend_src_services_purchase_order_service_listpurchaseorders",
+      "backend_src_services_purchase_order_service_mapheader",
+      "backend_src_services_purchase_order_service_mapline",
+      "backend_src_services_purchase_order_service_submitpurchaseorder",
+      "backend_src_services_purchase_order_service_validatecreatepayload",
+      "backend_tests_services_purchase_order_service_test",
+      "backend_tests_services_purchase_order_service_test_detailqueryresponses",
+      "backend_tests_services_purchase_order_service_test_happypathclientresponses",
+      "backend_tests_services_purchase_order_service_test_mockclient",
+      "backend_tests_services_purchase_order_service_test_mockdb",
+      "backend_tests_services_purchase_order_service_test_validpayload"
+    ],
+    "2": [
+      "frontend_package",
+      "frontend_package_dependencies",
+      "frontend_package_dependencies_vue",
+      "frontend_package_dependencies_vue_router",
+      "frontend_package_name",
+      "frontend_package_private",
+      "frontend_package_scripts",
+      "frontend_package_scripts_build",
+      "frontend_package_scripts_dev",
+      "frontend_package_scripts_preview",
+      "frontend_package_scripts_test",
+      "frontend_package_scripts_test_coverage",
+      "frontend_package_scripts_test_watch",
+      "frontend_package_type",
+      "frontend_package_version",
+      "vue",
+      "vue_router"
+    ],
+    "3": [
+      "backend_src_routes_requisition_routes",
+      "backend_src_routes_requisition_routes_requisitionroutes",
+      "backend_src_services_requisition_service",
+      "backend_src_services_requisition_service_approverequisition",
+      "backend_src_services_requisition_service_createprnumber",
+      "backend_src_services_requisition_service_createrequisition",
+      "backend_src_services_requisition_service_getrequisitionbyid",
+      "backend_src_services_requisition_service_getrequisitionopenlines",
+      "backend_src_services_requisition_service_listrequisitions",
+      "backend_src_services_requisition_service_mapheader",
+      "backend_src_services_requisition_service_mapline",
+      "backend_src_services_requisition_service_submitrequisition",
+      "backend_src_services_requisition_service_validatecreatepayload",
+      "backend_tests_services_requisition_service_test",
+      "backend_tests_services_requisition_service_test_mockdb"
+    ],
+    "4": [
+      "concurrently",
+      "package",
+      "package_author",
+      "package_description",
+      "package_devdependencies",
+      "package_devdependencies_concurrently",
+      "package_devdependencies_playwright_test",
+      "package_directories",
+      "package_directories_doc",
+      "package_license",
+      "package_main",
+      "package_name",
+      "package_version",
+      "playwright_test"
+    ],
+    "5": [
+      "package_scripts",
+      "package_scripts_dev",
+      "package_scripts_dev_backend",
+      "package_scripts_dev_frontend",
+      "package_scripts_test",
+      "package_scripts_test_backend",
+      "package_scripts_test_coverage",
+      "package_scripts_test_coverage_backend",
+      "package_scripts_test_coverage_frontend",
+      "package_scripts_test_e2e",
+      "package_scripts_test_e2e_list",
+      "package_scripts_test_e2e_ui",
+      "package_scripts_test_frontend",
+      "package_scripts_test_unit"
+    ],
+    "6": [
+      "backend_package",
+      "backend_package_devdependencies",
+      "backend_package_devdependencies_jest",
+      "backend_package_name",
+      "backend_package_private",
+      "backend_package_scripts",
+      "backend_package_scripts_dev",
+      "backend_package_scripts_start",
+      "backend_package_scripts_test",
+      "backend_package_scripts_test_coverage",
+      "backend_package_type",
+      "backend_package_version",
+      "jest"
+    ],
+    "7": [
+      "backend_package_dependencies",
+      "backend_package_dependencies_dotenv",
+      "backend_package_dependencies_fastify",
+      "backend_package_dependencies_fastify_cors",
+      "backend_package_dependencies_fastify_plugin",
+      "backend_package_dependencies_pg",
+      "backend_package_dependencies_uuid",
+      "dotenv",
+      "fastify",
+      "fastify_cors",
+      "fastify_plugin",
+      "pg",
+      "uuid"
+    ],
+    "8": [
+      "frontend_package_devdependencies",
+      "frontend_package_devdependencies_happy_dom",
+      "frontend_package_devdependencies_vite",
+      "frontend_package_devdependencies_vitejs_plugin_vue",
+      "frontend_package_devdependencies_vitest",
+      "frontend_package_devdependencies_vitest_coverage_v8",
+      "frontend_package_devdependencies_vue_test_utils",
+      "happy_dom",
+      "vite",
+      "vitejs_plugin_vue",
+      "vitest",
+      "vitest_coverage_v8",
+      "vue_test_utils"
+    ],
+    "9": [
+      "backend_src_app",
+      "backend_src_app_buildapp",
+      "backend_src_config",
+      "backend_src_config_config",
+      "backend_src_plugins_db",
+      "backend_src_plugins_db_dbplugin",
+      "backend_src_server",
+      "backend_src_server_start"
+    ],
+    "10": [
+      "docker_postgres_init_00_init_mvp_db",
+      "docker_postgres_init_00_init_mvp_db_sh__entry"
+    ],
+    "11": [
+      "playwright_config",
+      "playwright_config_defineconfig"
+    ],
+    "12": [
+      "backend_jest_config"
+    ],
+    "13": [
+      "frontend_vite_config"
+    ]
+  },
+  "cohesion": {
+    "0": 0.08387096774193549,
+    "1": 0.2549019607843137,
+    "2": 0.11764705882352941,
+    "3": 0.3523809523809524,
+    "4": 0.14285714285714285,
+    "5": 0.14285714285714285,
+    "6": 0.15384615384615385,
+    "7": 0.15384615384615385,
+    "8": 0.15384615384615385,
+    "9": 0.4642857142857143,
+    "10": 1.0,
+    "11": 1.0,
+    "12": 1.0,
+    "13": 1.0
+  },
+  "gods": [
+    {
+      "id": "package_scripts",
+      "label": "scripts",
+      "degree": 14
+    },
+    {
+      "id": "backend_src_routes_requisition_routes_requisitionroutes",
+      "label": "requisitionRoutes()",
+      "degree": 9
+    },
+    {
+      "id": "backend_src_routes_purchase_order_routes_purchaseorderroutes",
+      "label": "purchaseOrderRoutes()",
+      "degree": 8
+    },
+    {
+      "id": "backend_src_services_requisition_service_getrequisitionbyid",
+      "label": "getRequisitionById()",
+      "degree": 8
+    },
+    {
+      "id": "backend_src_services_purchase_order_service_createpurchaseorder",
+      "label": "createPurchaseOrder()",
+      "degree": 7
+    },
+    {
+      "id": "backend_src_services_purchase_order_service_getpurchaseorderbyid",
+      "label": "getPurchaseOrderById()",
+      "degree": 7
+    },
+    {
+      "id": "frontend_package_scripts",
+      "label": "scripts",
+      "degree": 7
+    },
+    {
+      "id": "backend_src_services_requisition_service_createrequisition",
+      "label": "createRequisition()",
+      "degree": 6
+    },
+    {
+      "id": "backend_src_app_buildapp",
+      "label": "buildApp()",
+      "degree": 6
+    },
+    {
+      "id": "backend_src_services_purchase_order_service_getopenpolines",
+      "label": "getOpenPoLines()",
+      "degree": 5
+    }
+  ],
+  "surprises": [
+    {
+      "source": "buildApp()",
+      "target": "purchaseOrderRoutes()",
+      "source_files": [
+        "backend/src/app.js",
+        "backend/src/routes/purchase-order-routes.js"
+      ],
+      "confidence": "INFERRED",
+      "relation": "indirect_call",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "buildApp()",
+      "target": "requisitionRoutes()",
+      "source_files": [
+        "backend/src/app.js",
+        "backend/src/routes/requisition-routes.js"
+      ],
+      "confidence": "INFERRED",
+      "relation": "indirect_call",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "buildApp()",
+      "target": "dbPlugin()",
+      "source_files": [
+        "backend/src/app.js",
+        "backend/src/plugins/db.js"
+      ],
+      "confidence": "INFERRED",
+      "relation": "indirect_call",
+      "why": "inferred connection - not explicitly stated in source; peripheral node `dbPlugin()` unexpectedly reaches hub `buildApp()`"
+    },
+    {
+      "source": "start()",
+      "target": "buildApp()",
+      "source_files": [
+        "backend/src/server.js",
+        "backend/src/app.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "peripheral node `start()` unexpectedly reaches hub `buildApp()`"
+    },
+    {
+      "source": "purchaseOrderRoutes()",
+      "target": "createPurchaseOrder()",
+      "source_files": [
+        "backend/src/routes/purchase-order-routes.js",
+        "backend/src/services/purchase-order-service.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}
