@@ -106,6 +106,7 @@
                   min="0"
                   step="0.01"
                   class="price-input"
+                  @input="emit('update:lines', [...props.lines])"
                 />
               </td>
               <td>{{ line.uom }}</td>

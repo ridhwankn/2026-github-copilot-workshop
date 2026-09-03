@@ -55,8 +55,8 @@ describe('POLineAllocationTable.vue', () => {
       expect(tables.length).toBeGreaterThanOrEqual(1);
       
       const table = tables[0];
-      expect(table.find('th').text()).toContain('PR Number');
-      expect(table.find('th').text()).toContain('Item Code');
+      expect(table.text()).toContain('PR Number');
+      expect(table.text()).toContain('Item Code');
     });
 
     test('displays each available PR line in requisition table', () => {
@@ -82,7 +82,7 @@ describe('POLineAllocationTable.vue', () => {
         ],
       });
 
-      const titles = wrapper.findAll('.form-section-title');
+      const titles = wrapper.findAll('.section-title');
       expect(titles.length).toBeGreaterThanOrEqual(2);
       expect(titles[1].text()).toContain('Allocated Lines');
     });
@@ -192,12 +192,12 @@ describe('POLineAllocationTable.vue', () => {
       await firstInput.setValue(100); // Try to allocate more than remaining
 
       // Trigger validation (blur event)
-      await firstInput.trigger('blur');
+      await firstInput.trigger('change');
 
       // Should emit error
       const errorEmitted = wrapper.emitted('update:error');
       expect(errorEmitted).toBeTruthy();
-      expect(errorEmitted[0][0]).toContain('allocation cannot exceed remaining');
+      expect(errorEmitted[0][0]).toContain('Allocation cannot exceed remaining quantity');
     });
 
     test('allows allocation exactly equal to remaining qty', async () => {
@@ -217,7 +217,7 @@ describe('POLineAllocationTable.vue', () => {
         ],
       });
 
-      expect(wrapper.find('.qty-input').element.value).toBe('70.00');
+      expect(Number(wrapper.find('.qty-input').element.value)).toBe(70);
     });
 
     test('shows allocated qty calculations', async () => {

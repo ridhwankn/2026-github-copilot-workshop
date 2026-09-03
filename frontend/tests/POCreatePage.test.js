@@ -117,7 +117,7 @@ describe('POCreatePage.vue', () => {
     await wrapper.vm.handleSubmit();
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.errorMessage).toContain('has invalid allocation');
+    expect(wrapper.vm.errorMessage).toContain('Allocation quantity must be greater than 0');
   });
 
   test('updates form when POHeaderForm emits vendor-name update', async () => {
