@@ -37,7 +37,7 @@ test.describe('Purchase Order module', () => {
       const payload = route.request().postDataJSON();
       expect(payload.vendorName).toBe('PT Sumber Teknik');
       expect(payload.lines[0].prLineId).toBe('pr-line-1');
-      expect(payload.lines[0].allocatedQty).toBe(5);
+      expect(payload.lines[0].qtyOrdered).toBe(5);
 
       await route.fulfill({
         status: 201,

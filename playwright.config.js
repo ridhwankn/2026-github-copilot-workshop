@@ -17,7 +17,7 @@ module.exports = defineConfig({
   outputDir: 'test-results',
 
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://127.0.0.1:5173',
     headless: true,
     screenshot: 'on',
     video: 'on',

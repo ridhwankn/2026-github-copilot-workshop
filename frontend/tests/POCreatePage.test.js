@@ -53,7 +53,12 @@ describe('POCreatePage.vue', () => {
         plugins: [router],
         stubs: {
           POHeaderForm: true,
-          POLineAllocationTable: true,
+          POLineAllocationTable: {
+            name: 'POLineAllocationTable',
+            props: ['lines', 'availableRequisitions', 'loading'],
+            emits: ['update:lines'],
+            template: '<div><slot name="actions"></slot></div>',
+          },
         },
       },
     });
@@ -74,6 +79,14 @@ describe('POCreatePage.vue', () => {
 
   test('renders PO header form component', () => {
     expect(wrapper.findComponent({ name: 'POHeaderForm' }).exists()).toBe(true);
+  });
+
+  test('renders the Figma PO header fields', () => {
+    const headerForm = wrapper.findComponent({ name: 'POHeaderForm' });
+    expect(headerForm.props('neededByDate')).toBe('');
+    expect(headerForm.props('currency')).toBe('IDR');
+    expect(headerForm.props('paymentTerms')).toBe('');
+    expect(headerForm.props('notes')).toBe('');
   });
 
   test('renders PO line allocation table component', () => {
@@ -147,5 +160,25 @@ describe('POCreatePage.vue', () => {
     await wrapper.vm.$nextTick();
 
     expect(wrapper.findComponent({ name: 'POLineAllocationTable' }).props('loading')).toBe(true);
+  });
+
+  test('sends allocation quantity as qtyOrdered to the API', async () => {
+    const { api } = await import('../src/api');
+    wrapper.vm.form.vendorName = 'Test Vendor';
+    wrapper.vm.form.lines = [{
+      prLineId: 'line-1',
+      allocatedQty: 5,
+      itemCode: 'ITEM-A',
+      itemName: 'Widget A',
+      uom: 'PCS',
+      siteCode: 'WH-1',
+      unitPrice: 100,
+    }];
+
+    await wrapper.vm.handleSubmit();
+
+    expect(api.createPurchaseOrder).toHaveBeenCalledWith(expect.objectContaining({
+      lines: [expect.objectContaining({ qtyOrdered: 5 })],
+    }));
   });
 });

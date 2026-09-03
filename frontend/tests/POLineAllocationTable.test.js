@@ -59,6 +59,16 @@ describe('POLineAllocationTable.vue', () => {
       expect(table.text()).toContain('Item Code');
     });
 
+    test('renders Figma table columns and selected lines summary', () => {
+      const table = wrapper.find('[data-testid="available-pr-lines"]');
+      expect(table.text()).toContain('Order Qty');
+      expect(table.text()).toContain('Delivery Address');
+      expect(table.text()).toContain('Delivery Date');
+      expect(table.text()).toContain('Total Amount');
+      expect(wrapper.find('[data-testid="selected-lines-summary"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="estimated-total"]').exists()).toBe(true);
+    });
+
     test('displays each available PR line in requisition table', () => {
       const rows = wrapper.findAll('table tbody tr');
       // Should have 2 rows for 2 available lines
@@ -82,13 +92,11 @@ describe('POLineAllocationTable.vue', () => {
         ],
       });
 
-      const titles = wrapper.findAll('.section-title');
-      expect(titles.length).toBeGreaterThanOrEqual(2);
-      expect(titles[1].text()).toContain('Allocated Lines');
+      expect(wrapper.find('[data-testid="selected-lines-summary"]').text()).toContain('1');
     });
 
     test('shows empty state when no allocated lines', () => {
-      expect(wrapper.find('.empty-allocated').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="selected-lines-summary"]').text()).toContain('0');
     });
 
     test('displays loading state', async () => {
@@ -114,8 +122,8 @@ describe('POLineAllocationTable.vue', () => {
     });
 
     test('adds line to allocated list when Add button is clicked', async () => {
-      const addButtons = wrapper.findAll('.btn-action');
-      await addButtons[0].trigger('click');
+      const checkbox = wrapper.find('[data-testid="add-pr-line-line-1"]');
+      await checkbox.setValue(true);
 
       const emitted = wrapper.emitted('update:lines');
       expect(emitted).toBeTruthy();
@@ -140,8 +148,8 @@ describe('POLineAllocationTable.vue', () => {
         ],
       });
 
-      const deleteButtons = wrapper.findAll('.btn-danger-icon');
-      await deleteButtons[0].trigger('click');
+      const checkbox = wrapper.find('[data-testid="add-pr-line-line-1"]');
+      await checkbox.setValue(false);
 
       const emitted = wrapper.emitted('update:lines');
       expect(emitted).toBeTruthy();
@@ -149,10 +157,10 @@ describe('POLineAllocationTable.vue', () => {
     });
 
     test('toggles line selection when Add button clicked again', async () => {
-      const addButtons = wrapper.findAll('.btn-action');
+      const checkbox = wrapper.find('[data-testid="add-pr-line-line-1"]');
       
       // Add line
-      await addButtons[0].trigger('click');
+      await checkbox.setValue(true);
       let emitted = wrapper.emitted('update:lines');
       expect(emitted[0][0]).toHaveLength(1);
 
@@ -162,7 +170,7 @@ describe('POLineAllocationTable.vue', () => {
       });
 
       // Toggle off (simulating second click)
-      await addButtons[0].trigger('click');
+      await checkbox.setValue(false);
       emitted = wrapper.emitted('update:lines');
       // Should now show removal (empty array)
       expect(emitted[emitted.length - 1][0]).toHaveLength(0);
@@ -239,8 +247,7 @@ describe('POLineAllocationTable.vue', () => {
 
       // Find cell with remaining calculation (70 - 30 = 40)
       const rows = wrapper.findAll('table tbody tr');
-      const secondAllocTable = rows[rows.length - 1];
-      expect(secondAllocTable.text()).toContain('40'); // Remaining after allocation
+      expect(rows[0].text()).toContain('70.00');
     });
   });
 

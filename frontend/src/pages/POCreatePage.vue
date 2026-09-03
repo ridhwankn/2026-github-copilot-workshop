@@ -17,6 +17,10 @@
       <!-- PO Header card -->
       <POHeaderForm 
         v-model:vendor-name="form.vendorName"
+        v-model:needed-by-date="form.neededByDate"
+        v-model:currency="form.currency"
+        v-model:payment-terms="form.paymentTerms"
+        v-model:notes="form.notes"
         @update:error="(msg) => errorMessage = msg"
       />
 
@@ -26,13 +30,15 @@
         :available-requisitions="availableRequisitions"
         :loading="loadingRequisitions"
         @update:error="(msg) => errorMessage = msg"
-      />
-
-      <!-- Action buttons -->
-      <div class="btn-group">
-        <RouterLink to="/purchase-orders" class="btn btn-outline">Cancel</RouterLink>
-        <button class="btn btn-primary" type="submit" data-testid="save-po" :disabled="isSubmitting">{{ isSubmitting ? 'Creating...' : 'Save As Draft' }}</button>
-      </div>
+        @refresh="loadAvailableRequisitions"
+      >
+        <template #actions>
+          <div class="btn-group">
+            <RouterLink to="/purchase-orders" class="btn btn-outline">Cancel</RouterLink>
+            <button class="btn btn-primary" type="button" data-testid="save-po" :disabled="isSubmitting" @click="handleSubmit">{{ isSubmitting ? 'Creating...' : 'Save As Draft' }}</button>
+          </div>
+        </template>
+      </POLineAllocationTable>
     </form>
   </section>
 </template>
@@ -52,6 +58,10 @@ const availableRequisitions = ref([]);
 
 const form = reactive({
   vendorName: '',
+  neededByDate: '',
+  currency: 'IDR',
+  paymentTerms: '',
+  notes: '',
   lines: [],
 });
 
@@ -107,7 +117,7 @@ async function handleSubmit() {
       vendorName: form.vendorName.trim(),
       lines: form.lines.map((line) => ({
         prLineId: line.prLineId,
-        allocatedQty: Number(line.allocatedQty),
+        qtyOrdered: Number(line.allocatedQty),
         unitPrice: Number(line.unitPrice || 0),
         itemCode: line.itemCode,
         itemName: line.itemName,
@@ -138,91 +148,54 @@ async function handleSubmit() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding: 1rem 0;
+  margin-bottom: 24px;
 }
 
 .page-header-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .back-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: var(--white);
   cursor: pointer;
-  font-size: 18px;
-  color: var(--text);
+  font-size: 20px;
+  font-weight: 700;
   text-decoration: none;
 }
 
-.back-btn:hover {
-  background: var(--bg-hover);
-}
+.back-btn:hover { opacity: 0.85; }
 
 .page-header h2 {
   margin: 0;
-  font-size: 1.5rem;
-  color: var(--text-color);
+  font-size: 24px;
+  font-weight: 600;
 }
 
 .page-header .muted {
-  margin: 0.25rem 0 0 0;
+  margin: 4px 0 0;
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 13px;
 }
 
 .error {
-  padding: 0.75rem 1rem;
-  background-color: #fee;
-  border: 1px solid #fcc;
-  border-radius: 4px;
-  color: #c00;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .btn-group {
   display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 12px;
+  margin-top: 24px;
   justify-content: flex-end;
 }
 
-.btn {
-  padding: 0.5rem 1.5rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 500;
-  text-decoration: none;
-  display: inline-block;
-  transition: all 0.2s;
-}
-
-.btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: var(--primary-hover);
-}
-
-.btn-outline {
-  background-color: transparent;
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-}
-
-.btn-outline:hover {
-  background-color: var(--bg-hover);
-}
 </style>

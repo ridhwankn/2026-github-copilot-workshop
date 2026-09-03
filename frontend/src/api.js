@@ -69,4 +69,17 @@ export const api = {
       method: 'POST',
     }),
   getOpenPurchaseOrderLines: (id) => apiFetch(`/api/purchase-orders/${id}/open-lines`),
+
+  // Goods Receipt API methods
+  listGoodsReceipts: () => apiFetch('/api/goods-receipts'),
+  createGoodsReceipt: (payload) =>
+    apiFetch('/api/goods-receipts', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  getGoodsReceipt: (id) => apiFetch(`/api/goods-receipts/${id}`),
+  postGoodsReceipt: (id) =>
+    apiFetch(`/api/goods-receipts/${id}/post`, {
+      method: 'POST',
+    }),
 };
